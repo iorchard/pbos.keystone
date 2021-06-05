@@ -1,0 +1,11 @@
+---
+- name: systemctl restart apache service
+  service:
+    name: "{{ apache_service_name }}.service"
+    state: "restarted"
+    enabled: true
+  become: true
+  changed_when: false
+  register: restart_apache_service
+  failed_when: restart_apache_service.failed
+...

@@ -1,0 +1,92 @@
+---
+- name: Setup | template keystone.conf
+  ansible.builtin.template:
+    dest: "{{ item.dest }}"
+    src: "{{ './templates' + item.dest + '.j2' }}"
+    owner: "root"
+    group: "keystone"
+    mode: "0640"
+  loop:
+    - { dest: "/etc/keystone/keystone.conf" }
+  become: true
+
+- name: Setup | create keystone db tables
+  ansible.builtin.shell: su -s /bin/bash keystone -c "keystone-manage db_sync"
+  become: true
+
+- name: Setup | fernet setup
+  ansible.builtin.command: >
+      keystone-manage fernet_setup \
+        --keystone-user keystone --keystone-group keystone
+  become: true
+
+- name: Setup | credential setup
+  ansible.builtin.command: >
+      keystone-manage credential_setup \
+        --keystone-user keystone --keystone-group keystone
+  become: true
+
+- name: Setup | bootstrap keystone
+  ansible.builtin.shell: >
+      keystone-manage bootstrap \
+        --bootstrap-password {{ openstack_admin_password }} \
+        --bootstrap-admin-url http://{{ keepalived_vip }}:5000/v3/ \
+        --bootstrap-internal-url http://{{ keepalived_vip }}:5000/v3/ \
+        --bootstrap-public-url http://{{ keepalived_vip }}:5000/v3/ \
+        --bootstrap-region-id RegionOne
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+  become: true
+  no_log: true
+
+- name: Setup | template apache.conf
+  ansible.builtin.template:
+    dest: "{{ item.dest }}"
+    src: "{{ './templates' + item.dest + '.j2' }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  loop: "{{ apache_conf }}"
+  become: true
+  notify:
+    - systemctl restart apache service
+
+- name: Setup | create adminrc
+  ansible.builtin.template:
+    dest: "{{ lookup('env', 'HOME') }}/.adminrc"
+    src: "adminrc.j2"
+    mode: "0600"
+
+- name: Setup | add adminrc to .bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ lookup('env', 'HOME') }}/.bashrc"
+    regex: "^source.*adminrc"
+    line: source ~/.adminrc
+    state: present
+
+- name: Setup | create directory for clouds.yaml
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.config/openstack"
+    state: directory
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+
+- name: Setup | create clouds.yaml
+  ansible.builtin.template:
+    dest: "{{ lookup('env', 'HOME') }}/.config/openstack/clouds.yaml"
+    src: "clouds.yaml.j2"
+    mode: "0600"
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+
+- name: Setup | create Service Project
+  openstack.cloud.project:
+    cloud: pbos
+    name: service
+    interface: admin
+    domain_id: default
+    description: "Service Project"
+    state: present
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+...

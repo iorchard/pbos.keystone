@@ -1,0 +1,4 @@
+---
+openstack_release: "wallaby"
+keepalived_vip: ""
+...

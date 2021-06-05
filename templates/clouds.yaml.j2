@@ -1,0 +1,13 @@
+---
+clouds:
+  pbos:
+    identity_api_version: 3
+    auth:
+      auth_url: http://{{ keepalived_vip }}:5000/v3
+      project_name: admin
+      username: admin
+      password: {{ openstack_admin_password }}
+      user_domain_name: default
+      project_domain_name: default
+    region_name: RegionOne
+...
