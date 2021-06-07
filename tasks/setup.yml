@@ -1,4 +1,15 @@
 ---
+- name: Setup | copy keystone init file
+  ansible.builtin.copy:
+    dest: "{{ item.dest }}"
+    src: "{{ ansible_distribution | lower }}{{ item.dest }}"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  loop:
+    - {dest: "/etc/init.d/keystone"}
+  become: true
+
 - name: Setup | template keystone configuration
   ansible.builtin.template:
     dest: "{{ item.dest }}"
@@ -8,9 +19,11 @@
     mode: "0640"
     backup: true
   loop:
-    - { dest: "/etc/keystone/keystone.conf" }
-    - { dest: "/etc/keystone/keystone-uwsgi.ini" }
+    - {dest: "/etc/keystone/keystone.conf"}
+    - {dest: "/etc/keystone/keystone-uwsgi-bind.ini"}
   become: true
+  notify:
+    - systemctl restart keystone service
 
 - name: Setup | create keystone db tables
   ansible.builtin.shell: su -s /bin/bash keystone -c "keystone-manage db_sync"
