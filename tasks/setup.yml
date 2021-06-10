@@ -6,8 +6,7 @@
     owner: "root"
     group: "root"
     mode: "0755"
-  loop:
-    - {dest: "/etc/init.d/keystone"}
+  loop: "{{ os_service_init }}"
   become: true
 
 - name: Setup | template keystone configuration
@@ -18,14 +17,12 @@
     group: "keystone"
     mode: "0640"
     backup: true
-  loop:
-    - {dest: "/etc/keystone/keystone.conf"}
-    - {dest: "/etc/keystone/keystone-uwsgi-bind.ini"}
+  loop: "{{ os_service_conf }}"
   become: true
   notify:
-    - systemctl restart keystone service
+    - systemctl restart service
 
-- name: Setup | create keystone db tables
+- name: Setup | create db tables
   ansible.builtin.shell: su -s /bin/bash keystone -c "keystone-manage db_sync"
   become: true
 

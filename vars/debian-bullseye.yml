@@ -26,6 +26,14 @@ keystone_packages:
 apache_conf: 
   - { dest: "/etc/apache2/apache2.conf" }
 
-keystone_service_name: "keystone"
-apache_service_name: "apache2"
+os_service_init:
+  - {dest: "/etc/init.d/keystone"}
+
+os_service_conf:
+  - {dest: "/etc/keystone/keystone.conf"}
+  - {dest: "/etc/keystone/keystone-uwsgi-bind.ini"}
+
+os_systemd_service_name:
+  - keystone
+  - apache2
 ...

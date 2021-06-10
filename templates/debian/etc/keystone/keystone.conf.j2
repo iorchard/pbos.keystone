@@ -1,6 +1,6 @@
 [DEFAULT]
-log_file = keystone.log
-log_dir = /var/log/keystone
+log_file = {{ os_service_name }}.log
+log_dir = /var/log/{{ os_service_name }}
 [application_credential]
 [assignment]
 [auth]
@@ -11,7 +11,7 @@ template_file = /etc/keystone/default_catalog.templates
 [cors]
 [credential]
 [database]
-connection = mysql+pymysql://keystone:{{ mariadb_keystone_password }}@{{ ansible_host }}/keystone
+connection = mysql+pymysql://{{ os_service_name }}:{{ db_password }}@{{ ansible_host }}/{{ os_service_name }}
 [domain_config]
 [endpoint_filter]
 [endpoint_policy]

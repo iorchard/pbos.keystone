@@ -1,21 +1,12 @@
 ---
-- name: systemctl restart keystone service
+- name: systemctl restart service
   service:
-    name: "{{ keystone_service_name }}.service"
+    name: "{{ item }}.service"
     state: "restarted"
     enabled: true
   become: true
   changed_when: false
-  register: restart_keystone_service
-  failed_when: restart_keystone_service.failed
-
-- name: systemctl restart apache service
-  service:
-    name: "{{ apache_service_name }}.service"
-    state: "restarted"
-    enabled: true
-  become: true
-  changed_when: false
-  register: restart_apache_service
-  failed_when: restart_apache_service.failed
+  register: restart_systemd_service
+  failed_when: restart_systemd_service.failed
+  loop: "{{ os_systemd_service_name }}"
 ...
