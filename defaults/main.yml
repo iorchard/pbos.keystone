@@ -5,4 +5,5 @@ os_service_name: "keystone"
 db_password: "{{ keystone_password }}"
 os_password: "{{ keystone_password }}"
 keystone_port: 5000
+keystone_api_processes: 4
 ...

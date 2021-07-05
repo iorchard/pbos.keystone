@@ -3,6 +3,7 @@ prereq_pkgs:
   - apt-transport-https
   - ca-certificates
   - curl
+  - openstack-pkg-tools
 
 # osbpo apt repo keyring
 osbpo_keyring:
@@ -19,21 +20,16 @@ osbpo_repos:
 keystone_packages:
   - keystone
   - python3-openstackclient
-  - apache2
-  - libapache2-mod-wsgi-py3
   - python3-oauth2client
-
-apache_conf: 
-  - { dest: "/etc/apache2/apache2.conf" }
 
 os_service_init:
   - {dest: "/etc/init.d/keystone"}
 
 os_service_conf:
   - {dest: "/etc/keystone/keystone.conf"}
+  - {dest: "/etc/keystone/keystone-uwsgi.ini"}
   - {dest: "/etc/keystone/keystone-uwsgi-bind.ini"}
 
 os_systemd_service_name:
   - keystone
-  - apache2
 ...

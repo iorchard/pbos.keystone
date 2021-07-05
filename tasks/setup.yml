@@ -19,24 +19,64 @@
     backup: true
   loop: "{{ os_service_conf }}"
   become: true
+  changed_when: true
   notify:
     - systemctl restart service
 
 - name: Setup | create db tables
   ansible.builtin.shell: su -s /bin/bash keystone -c "keystone-manage db_sync"
   become: true
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
 
-- name: Setup | fernet setup
+- name: Setup | fernet setup on the first keystone node
   ansible.builtin.command: >
       keystone-manage fernet_setup \
         --keystone-user keystone --keystone-group keystone
   become: true
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
 
-- name: Setup | credential setup
+- name: Setup | credential setup on the first keystone node
   ansible.builtin.command: >
       keystone-manage credential_setup \
         --keystone-user keystone --keystone-group keystone
   become: true
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+
+- name: Setup | synchronize keystone keys to /tmp on other nodes
+  ansible.posix.synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    checksum: true
+  become: true
+  delegate_to: "{{ groups['keystone'][0] }}"
+  when: inventory_hostname != groups['keystone'][0]
+  loop:
+    - {src: "/etc/keystone/credential-keys/", dest: "/tmp/crendential-keys/"}
+    - {src: "/etc/keystone/fernet-keys/", dest: "/tmp/fernet-keys/"}
+
+- name: Setup | synchronize keystone keys from /tmp on other nodes
+  ansible.posix.synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    checksum: true
+  become: true
+  delegate_to: "{{ inventory_hostname }}"
+  when: inventory_hostname != groups['keystone'][0]
+  loop:
+    - {dest: "/etc/keystone/credential-keys/", src: "/tmp/crendential-keys/"}
+    - {dest: "/etc/keystone/fernet-keys/", src: "/tmp/fernet-keys/"}
+
+- name: Setup | clean up temporary key directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  become: true
+  loop:
+    - "/tmp/crendential-keys/"
+    - "/tmp/fernet-keys/"
 
 - name: Setup | bootstrap keystone
   ansible.builtin.shell: >
@@ -46,23 +86,10 @@
         --bootstrap-internal-url http://{{ keepalived_vip }}:5000/v3/ \
         --bootstrap-public-url http://{{ keepalived_vip }}:5000/v3/ \
         --bootstrap-region-id RegionOne
+  become: true
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
-  become: true
   no_log: true
-
-- name: Setup | template apache.conf
-  ansible.builtin.template:
-    dest: "{{ item.dest }}"
-    src: "{{ ansible_distribution | lower }}{{ item.dest + '.j2' }}"
-    owner: "root"
-    group: "root"
-    mode: "0644"
-    backup: true
-  loop: "{{ apache_conf }}"
-  become: true
-  notify:
-    - systemctl restart apache service
 
 - name: Setup | create adminrc
   ansible.builtin.template:
