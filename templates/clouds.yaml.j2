@@ -5,6 +5,7 @@ clouds:
     auth:
       auth_url: http://{{ keepalived_vip }}:5000/v3
       project_name: admin
+      system_scope: all
       username: admin
       password: {{ openstack_admin_password }}
       user_domain_name: default
