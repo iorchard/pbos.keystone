@@ -31,5 +31,5 @@ os_service_conf:
   - {dest: "/etc/keystone/keystone-uwsgi-bind.ini"}
 
 os_systemd_service_name:
-  - keystone
+  - keystone.service
 ...
