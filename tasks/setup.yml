@@ -14,7 +14,7 @@
     dest: "{{ item.dest }}"
     src: "{{ ansible_distribution | lower }}{{ item.dest + '.j2' }}"
     owner: "root"
-    group: "keystone"
+    group: "{{ os_service_name }}"
     mode: "0640"
     backup: true
   loop: "{{ os_service_conf }}"
@@ -50,6 +50,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     checksum: true
+    rsync_path: "rsync"
   become: true
   delegate_to: "{{ groups['keystone'][0] }}"
   when: inventory_hostname != groups['keystone'][0]
@@ -57,17 +58,18 @@
     - {src: "/etc/keystone/credential-keys/", dest: "/tmp/crendential-keys/"}
     - {src: "/etc/keystone/fernet-keys/", dest: "/tmp/fernet-keys/"}
 
-- name: Setup | synchronize keystone keys from /tmp on other nodes
-  ansible.posix.synchronize:
+- name: Setup | copy keystone keys from /tmp on other nodes
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    checksum: true
+    owner: "{{ os_service_name }}"
+    remote_src: true
   become: true
   delegate_to: "{{ inventory_hostname }}"
   when: inventory_hostname != groups['keystone'][0]
   loop:
-    - {dest: "/etc/keystone/credential-keys/", src: "/tmp/crendential-keys/"}
-    - {dest: "/etc/keystone/fernet-keys/", src: "/tmp/fernet-keys/"}
+    - {dest: "/etc/keystone/credential-keys", src: "/tmp/crendential-keys"}
+    - {dest: "/etc/keystone/fernet-keys", src: "/tmp/fernet-keys"}
 
 - name: Setup | clean up temporary key directories
   ansible.builtin.file:
@@ -90,6 +92,9 @@
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
   no_log: true
+
+- name: Setup | flush handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Setup | create adminrc
   ansible.builtin.template:
