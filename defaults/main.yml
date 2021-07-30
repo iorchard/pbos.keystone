@@ -1,9 +1,10 @@
 ---
 openstack_release: "wallaby"
-keepalived_vip: ""
+keepalived_vip: ~
 os_service_name: "keystone"
 db_password: "{{ keystone_password }}"
 os_password: "{{ keystone_password }}"
 keystone_port: 5000
 keystone_api_processes: 4
+os_service_url: "http://{{ keepalived_vip }}:{{ keystone_port }}/v3"
 ...

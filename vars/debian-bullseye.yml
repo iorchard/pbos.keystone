@@ -1,4 +1,5 @@
 ---
+apt_state: "latest"
 prereq_pkgs:
   - apt-transport-https
   - ca-certificates
@@ -18,7 +19,7 @@ osbpo_repos:
   - repo: "deb [signed-by=/usr/share/keyrings/osbpo-keyring.gpg] http://osbpo.debian.net/osbpo bullseye-{{ openstack_release }}-backports-nochange main"
     filename: "openstack"
 
-keystone_packages:
+packages:
   - keystone
   - python3-openstackclient
   - python3-oauth2client

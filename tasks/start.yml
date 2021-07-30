@@ -1,10 +1,14 @@
 ---
 - name: Start | import common tasks
-  tags: keystone
+  tags:
+    - keystone
+    - openstack
   ansible.builtin.import_tasks: "common.yml"
 
 - name: Start | start service
-  tags: keystone
+  tags:
+    - keystone
+    - openstack
   block:
     - name: Start | start service
       ansible.builtin.service:

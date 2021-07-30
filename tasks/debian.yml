@@ -2,9 +2,13 @@
 - name: Debian | Install prerequisite packages
   apt:
     name: "{{ item }}"
-    state: present
+    state: "{{ apt_state }}"
     update_cache: true
     allow_unauthenticated: false
+  register: _apt
+  until: not _apt.failed
+  retries: 3
+  delay: 3
   loop: "{{ prereq_pkgs }}"
   become: true
 
@@ -26,12 +30,16 @@
   become: true
   loop: "{{ osbpo_repos }}"
 
-- name: Debian | Install keystone packages
+- name: Debian | Install packages
   ansible.builtin.apt:
     name: "{{ item }}"
-    state: present
+    state: "{{ apt_state }}"
     update_cache: true
     allow_unauthenticated: false
+  register: _apt
+  until: not _apt.failed
+  retries: 3
+  delay: 3
   become: true
-  loop: "{{ keystone_packages }}"
+  loop: "{{ packages }}"
 ...

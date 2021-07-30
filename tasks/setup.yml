@@ -68,8 +68,8 @@
   delegate_to: "{{ inventory_hostname }}"
   when: inventory_hostname != groups['keystone'][0]
   loop:
-    - {dest: "/etc/keystone/credential-keys", src: "/tmp/crendential-keys"}
-    - {dest: "/etc/keystone/fernet-keys", src: "/tmp/fernet-keys"}
+    - {dest: "/etc/keystone/", src: "/tmp/crendential-keys"}
+    - {dest: "/etc/keystone/", src: "/tmp/fernet-keys"}
 
 - name: Setup | clean up temporary key directories
   ansible.builtin.file:
@@ -123,6 +123,25 @@
     mode: "0600"
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
+
+- name: Setup | wait for port open
+  ansible.builtin.wait_for:
+    host: "{{ ansible_host }}"
+    port: "{{ keystone_port }}"
+    sleep: 2
+    timeout: 10
+    state: started
+
+- name: Setup | check service is available
+  ansible.builtin.uri:
+    url: "{{ os_service_url }}"
+    method: GET
+  register: _result
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+  until: _result.status == 200
+  retries: 5
+  delay: 3
 
 - name: Setup | create Service Project
   openstack.cloud.project:

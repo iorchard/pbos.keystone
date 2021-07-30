@@ -1,0 +1,47 @@
+---
+- name: Delete | import common tasks
+  tags:
+    - keystone
+    - openstack
+  ansible.builtin.import_tasks: "common.yml"
+
+- name: Delete | purge packages
+  tags:
+    - keystone
+    - openstack
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    autoremove: true
+    purge: true
+    state: absent
+  loop: "{{ packages }}"
+  become: true
+
+- name: DB | delete database
+  tags:
+    - keystone
+    - openstack
+  community.mysql.mysql_db:
+    login_unix_socket: "/run/mysqld/mysqld.sock"
+    login_user: "root"
+    login_password: "{{ mariadb_root_password }}"
+    name: "{{ os_service_name }}"
+    state: absent
+  delegate_to: "{{ groups['mariadb'][0] }}"
+  run_once: true
+  no_log: true
+
+- name: Delete | delete adminrc and cluster.yml
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ lookup('env', 'HOME') }}/.config/openstack"
+    - "{{ lookup('env', 'HOME') }}/.adminrc"
+
+- name: Delete | remove adminrc in .bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ lookup('env', 'HOME') }}/.bashrc"
+    regex: "^source.*adminrc"
+    state: absent
+...
