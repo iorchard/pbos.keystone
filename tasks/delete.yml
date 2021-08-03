@@ -30,6 +30,15 @@
   run_once: true
   no_log: true
 
+- name: Delete | delete config directory
+  tags:
+    - keystone
+    - openstack
+  ansible.builtin.file:
+    path: "{{ os_conf_dir }}"
+    state: absent
+  become: true
+
 - name: Delete | delete adminrc and cluster.yml
   ansible.builtin.file:
     path: "{{ item }}"
