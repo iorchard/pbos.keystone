@@ -8,6 +8,7 @@
     mode: "0755"
   loop: "{{ os_service_init }}"
   become: true
+  when: ansible_distribution == "Debian"
 
 - name: Setup | template keystone configuration
   ansible.builtin.template:
