@@ -27,10 +27,11 @@ packages:
 os_service_init:
   - {dest: "/etc/init.d/keystone"}
 
+os_conf_dir: "/etc/keystone"
 os_service_conf:
-  - {dest: "/etc/keystone/keystone.conf"}
-  - {dest: "/etc/keystone/keystone-uwsgi.ini"}
-  - {dest: "/etc/keystone/keystone-uwsgi-bind.ini"}
+  - {dest: "{{ os_conf_dir }}/keystone.conf"}
+  - {dest: "{{ os_conf_dir }}/keystone-uwsgi.ini"}
+  - {dest: "{{ os_conf_dir }}/keystone-uwsgi-bind.ini"}
 
 os_systemd_service_name:
   - keystone.service
