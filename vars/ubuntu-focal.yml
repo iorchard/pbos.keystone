@@ -1,0 +1,24 @@
+---
+apt_state: "latest"
+prereq_pkgs:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gpg
+  - openstack-pkg-tools
+
+packages:
+  - keystone
+  - python3-openstackclient
+  - python3-oauth2client
+
+os_service_init:
+  - {dest: "/etc/init.d/keystone"}
+
+os_service_conf:
+  - {dest: "/etc/keystone/keystone.conf"}
+  - {dest: "/etc/apache2/sites-available/keystone.conf"}
+
+os_systemd_service_name:
+  - apache2.service
+...
