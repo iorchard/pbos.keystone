@@ -12,6 +12,7 @@ packages:
   - keystone
   - python3-keystone
   - python3-oauth2client
+  - python3-openstackclient
 
 os_service_init: []
 
