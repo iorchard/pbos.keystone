@@ -1,0 +1,26 @@
+---
+pkg_state: "latest"
+prereq_pkgs:
+  - ca-certificates
+  - curl
+
+packages:
+  - openstack-keystone
+  - httpd
+  - python3-mod_wsgi
+  - python3-keystone
+  - python3-openstackclient
+
+openstack_repo_rpm: "https://www.rdoproject.org/repos/rdo-release.el8.rpm"
+
+mariadb_service_socket: "/var/lib/mysql/mysql.sock"
+
+os_service_init: []
+
+os_service_conf:
+  - {dest: "/etc/keystone/keystone.conf"}
+  - {dest: "/etc/httpd/conf.d/wsgi-keystone.conf"}
+
+os_systemd_service_name:
+  - httpd.service
+...

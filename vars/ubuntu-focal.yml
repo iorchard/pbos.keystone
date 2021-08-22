@@ -1,5 +1,5 @@
 ---
-apt_state: "latest"
+pkg_state: "latest"
 prereq_pkgs:
   - apt-transport-https
   - ca-certificates
@@ -13,6 +13,8 @@ packages:
   - python3-keystone
   - python3-oauth2client
   - python3-openstackclient
+
+mariadb_service_socket: "/run/mysqld/mysqld.sock"
 
 os_service_init: []
 

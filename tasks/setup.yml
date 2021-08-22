@@ -1,15 +1,4 @@
 ---
-- name: Setup | copy keystone init file
-  ansible.builtin.copy:
-    dest: "{{ item.dest }}"
-    src: "{{ ansible_os_family | lower }}{{ item.dest }}"
-    owner: "root"
-    group: "root"
-    mode: "0755"
-  loop: "{{ os_service_init }}"
-  become: true
-  when: ansible_distribution == "Debian"
-
 - name: Setup | template keystone configuration
   ansible.builtin.template:
     dest: "{{ item.dest }}"
@@ -31,17 +20,17 @@
   run_once: true
 
 - name: Setup | fernet setup on the first keystone node
-  ansible.builtin.command: >
-      keystone-manage fernet_setup \
-        --keystone-user keystone --keystone-group keystone
+  ansible.builtin.command: >-
+    keystone-manage fernet_setup \
+      --keystone-user keystone --keystone-group keystone
   become: true
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
 
 - name: Setup | credential setup on the first keystone node
-  ansible.builtin.command: >
-      keystone-manage credential_setup \
-        --keystone-user keystone --keystone-group keystone
+  ansible.builtin.command: >-
+    keystone-manage credential_setup \
+      --keystone-user keystone --keystone-group keystone
   become: true
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
