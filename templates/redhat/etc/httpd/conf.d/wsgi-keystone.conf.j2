@@ -1,6 +1,6 @@
-Listen {{ ansible_host }}:5000
+Listen {{ ansible_host }}:{{ keystone_port }}
 
-<VirtualHost *:5000>
+<VirtualHost *:{{ keystone_port }}>
     WSGIDaemonProcess keystone-public processes=5 threads=1 user=keystone group=keystone display-name=%{GROUP}
     WSGIProcessGroup keystone-public
     WSGIScriptAlias / /usr/bin/keystone-wsgi-public
