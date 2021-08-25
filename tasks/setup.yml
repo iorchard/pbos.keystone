@@ -142,7 +142,7 @@
   run_once: true
   until: _result.status == 200
   retries: 5
-  delay: 3
+  delay: 5
 
 - name: Setup | create Service Project
   openstack.cloud.project:

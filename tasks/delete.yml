@@ -9,10 +9,9 @@
   tags:
     - keystone
     - openstack
-  ansible.builtin.apt:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: absent
-    purge: true
   loop: "{{ packages }}"
   become: true
 
@@ -21,7 +20,7 @@
     - keystone
     - openstack
   community.mysql.mysql_db:
-    login_unix_socket: "/run/mysqld/mysqld.sock"
+    login_unix_socket: "{{ mariadb_service_socket }}"
     login_user: "root"
     login_password: "{{ mariadb_root_password }}"
     name: "{{ os_service_name }}"
@@ -44,12 +43,12 @@
     path: "{{ item }}"
     state: absent
   loop:
-    - "{{ lookup('env', 'HOME') }}/.config/openstack"
-    - "{{ lookup('env', 'HOME') }}/.adminrc"
+    - "{{ ansible_env.HOME }}/.config/openstack"
+    - "{{ ansible_env.HOME }}/.adminrc"
 
 - name: Delete | remove adminrc in .bashrc
   ansible.builtin.lineinfile:
-    path: "{{ lookup('env', 'HOME') }}/.bashrc"
+    path: "{{ ansible_env.HOME }}/.bashrc"
     regex: "^source.*adminrc"
     state: absent
 ...
