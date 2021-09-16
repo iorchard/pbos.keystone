@@ -23,5 +23,5 @@ os_service_conf:
   - {dest: "/etc/apache2/sites-available/keystone.conf"}
 
 os_systemd_service_name:
-  - apache2.service
+  - {name: "apache2.service", state: "reloaded"}
 ...

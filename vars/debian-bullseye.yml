@@ -36,5 +36,5 @@ os_service_conf:
   - {dest: "{{ os_conf_dir }}/keystone-uwsgi-bind.ini"}
 
 os_systemd_service_name:
-  - keystone.service
+  - {name: "keystone.service", state: "restarted"}
 ...
