@@ -4,7 +4,9 @@ keepalived_vip: ~
 os_service_name: "keystone"
 db_password: "{{ keystone_password }}"
 os_password: "{{ keystone_password }}"
+memcached_port: 11211
 keystone_port: 5000
 keystone_api_processes: 4
 os_service_url: "http://{{ keepalived_vip }}:{{ keystone_port }}/v3"
+mariadb_ca_cert: "/etc/my.cnf.d/certificates/ca-cert.pem"
 ...
