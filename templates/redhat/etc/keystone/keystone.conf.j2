@@ -1,6 +1,7 @@
 [DEFAULT]
 log_file = {{ os_service_name }}.log
 log_dir = /var/log/{{ os_service_name }}
+transport_url = rabbit://openstack:{{ rabbitmq_openstack_password }}@{{ keepalived_vip }}:{{ rabbitmq_tls_port }}
 [application_credential]
 [assignment]
 [auth]
@@ -30,7 +31,11 @@ sso_callback_template = /etc/keystone/sso_callback_template.html
 [oslo_messaging_amqp]
 [oslo_messaging_kafka]
 [oslo_messaging_notifications]
+driver = messagingv2
 [oslo_messaging_rabbit]
+ssl=true
+ssl_version=TLSv1_2
+ssl_ca_file={{ rabbitmq_ca_cert }}
 [oslo_middleware]
 [oslo_policy]
 policy_dirs = /etc/keystone/policy.d
