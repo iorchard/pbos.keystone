@@ -87,7 +87,7 @@
         --bootstrap-password {{ openstack_admin_password }} \
         --bootstrap-admin-url http://{{ keepalived_vip }}:{{ keystone_port }}/v3/ \
         --bootstrap-internal-url http://{{ keepalived_vip }}:{{ keystone_port }}/v3/ \
-        --bootstrap-public-url http://{{ keepalived_vip }}:{{ keystone_port }}/v3/ \
+        --bootstrap-public-url http://{{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}:{{ keystone_port }}/v3/ \
         --bootstrap-region-id RegionOne
   become: true
   delegate_to: "{{ groups['keystone'][0] }}"
