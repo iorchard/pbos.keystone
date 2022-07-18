@@ -115,11 +115,26 @@
     path: "{{ ansible_env.HOME }}/.config/openstack"
     state: directory
 
-- name: Setup | create clouds.yaml
-  ansible.builtin.template:
-    dest: "{{ ansible_env.HOME }}/.config/openstack/clouds.yaml"
-    src: "clouds.yaml.j2"
+- name: Setup | add admin credential to clouds.yaml
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.config/openstack/clouds.yaml"
+    create: true
     mode: "0600"
+    insertbefore: BOF
+    marker: "# {mark} ADMIN CREDENTIAL BLOCK"
+    block: >-
+      clouds:
+        pbos:
+          identity_api_version: 3
+          auth:
+            auth_url: http://{{ keepalived_vip }}:{{ keystone_port }}/v3
+            project_name: admin
+            system_scope: all
+            username: admin
+            password: {{ openstack_admin_password }}
+            user_domain_name: default
+            project_domain_name: default
+          region_name: RegionOne
 
 - name: Setup | wait for port open
   ansible.builtin.wait_for:
