@@ -33,9 +33,11 @@ sso_callback_template = /etc/keystone/sso_callback_template.html
 [oslo_messaging_notifications]
 driver = messagingv2
 [oslo_messaging_rabbit]
-ssl=true
-ssl_version=TLSv1_2
-ssl_ca_file={{ rabbitmq_ca_cert }}
+ssl = true
+ssl_version = TLSv1_2
+ssl_ca_file = {{ rabbitmq_ca_cert }}
+rabbit_quorum_queue = True
+
 [oslo_middleware]
 [oslo_policy]
 policy_dirs = /etc/keystone/policy.d
